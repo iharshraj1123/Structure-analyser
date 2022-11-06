@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Structure Analyser</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="main">
+        <div id="toolbar" class="toolbar">
+          <div onclick="clear_svg()" class="toolbar-button">New</div>
+          <div class="toolbar-button">Open</div>
+          <div class="toolbar-button" onclick="save_data()">Save</div>
+          <div onclick="update_todo('roller')" class="toolbar-button toolbar-button-roller">Roller</div>
+          <div onclick="update_todo('pinned')" class="toolbar-button toolbar-button-pinned">Pinned</div>
+          <div onclick="update_todo('fixed')" class="toolbar-button toolbar-button-fixed">Fixed</div>
+          <!-- <div onclick="update_todo('hinge')" class="toolbar-button toolbar-button-hinge">Hinge</div> -->
+          <div onclick="update_todo('pointLoad')" class="toolbar-button toolbar-button-pointLoad">Point Load</div>
+          <div onclick="update_todo('concMoment')" class="toolbar-button toolbar-button-concMoment">Conc. Moment</div>
+          <div onclick="update_todo('udl')" class="toolbar-button toolbar-button-udl">UDL</div>
+          <div onclick="sti_solve()" class="toolbar-button toolbar-button-solve">Solve</div>
+        </div>
+        <div class="sheet-body">
+          <div class="sheet-div-outer">
+            <svg class="sheet-svg">
+              <g class="sheet-svg-grid"></g>
+              <g class="svg-supports"></g>
+              <g class="svg-loads"></g>
+              <g class="sheet-svg-insert-temp"></g>
+              <g class="sheet-svg-insert"></g>
+              <g class="sheet-svg-insert-hinges"></g>
+              <g class="sheet-svg-insert-nodes"></g>
+            </svg>
+          </div>
+          <div class="sidebar">
+            <p class="sidebar-debugger"></p>
+            <p class="Results">
+            </p>
+          </div>
+        </div>
+    </div>
+
+    <div class="co-ord-div hidemepls" id="co-ord-div">
+      <div id="co-ord-divheader" class="co-ord-div-top">
+        <div class="co-ord-div-top-left">Relative Coordinates</div>
+        <div class="co-ord-div-top-right" onclick="coordclose(0)">&times;</div>
+      </div>
+      <div class="co-ord-div-bottom">
+        <div style="margin-left: 10px;">
+          <div>dx: <input class="coord-dx" type="text"></div>
+          <div>dy: <input class="coord-dy" type="text"></div>
+          <div>A (in cm<sup>2</sup>): <input class="coord-A" type="text" value="1"></div>
+          <div>E (in GPa): <input class="coord-E" type="text" value="1"></div>
+          <div>I (cm<sup>4</sup>): <input class="coord-I" type="text" value="1"></div>
+        </div>
+        <button class="co-ord-div-apply" onclick="applyPoint()">Apply</button>
+      </div>
+    </div>
+    <div class="co-ord-div magn-div hidemepls" id="magn-div">
+      <div id="magn-divheader" class="co-ord-div-top">
+        <div class="co-ord-div-top-left">Magnitude</div>
+        <div class="co-ord-div-top-right" onclick="coordclose(1)">&times;</div>
+      </div>
+      <div class="co-ord-div-bottom">
+        <div style="margin-left: 10px;">
+          <div>Magnitude (KN&m): <input class="magn-input" type="text" value="5"></div><br>
+          <div class="mag-deg-div">Angle with +x axis (deg): <input class="magn-input magndeg-input" type="text" value="90"></div>
+          <div class="co-ord-div-apply magn-remove">Click to remove a load</div>
+        </div>
+      </div>
+    </div>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.3.2/math.js" integrity="sha512-L5ISzAYp4oiIeT5M/v2HCMmaRpSblbKEcbp7WFr9d+5E9WdzBEaMoseWUxAknpm+DomtjRkLyWdCptF5rw2DdQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <script src="math.js"></script>
+    <script src="render.js"></script>
+    <script src="solver.js"></script>
+  
+  <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+
+  </body>
+</html>
