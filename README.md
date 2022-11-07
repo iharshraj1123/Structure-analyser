@@ -9,6 +9,6 @@ Simple and light. Can have bugs, always confirm the results.
 - You cant make nodes randomly between an already defined/drawn member. Make nodes beforehand wherever its needed.
 
 #Note
+- Saving feature won't work without a HTTP server ie apache or node.js.
 - The main file is index.html, open it in any modern browser.
 - html file in dist is portable version (but its not always updated). The whole app is compiled into the structure analyser.html in dist.
-
