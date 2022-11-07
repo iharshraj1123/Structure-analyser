@@ -25,9 +25,9 @@ let magn_div = document.getElementsByClassName("magn-div")[0];
 let supp_grp = document.getElementsByClassName("svg-supports")[0];
 let load_grp = document.getElementsByClassName("svg-loads")[0];
 let result_div= document.getElementsByClassName("Results")[0];
-let node_database = [{node_no:0,cx:0,cy:0,support:"none",pointLoad:"none",concMoment:"none",all_data:["node_no","cx","cy","support","pointLoad","concMoment"]}]
+let node_database = [{node_no:0,cx:0,cy:0,support:"none",pointLoad:"none",concMoment:"none",all_data:["node_no","cx","cy","support"]}]
 let member_database = [{node1:0,node2:0,length:0,x1:0,y1:0,x2:0,y2:0,I:1,E:1,A:1,all_data:["node1","node2","length","A","E","I"]}]
-let load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis",all_data:["node_no","type","magn",""]}]
+let load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis",all_data:["node_no","type","magn","direction"]}]
 let node_click_todo = "none"
 let curr_active_node=0;
 let was_it_the_node=false;
@@ -514,40 +514,63 @@ function save_data(){
 }
 
 setInterval(function() {
-    document.getElementsByClassName("sidebar-debugger")[0].innerHTML = "<h3>curr_active_node</h3>"+ curr_active_node +"<br>"
-    // document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>node_database</h3>"+JSON.stringify(node_database) +"<br>"
-    // document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>member_database</h3>"+JSON.stringify(member_database)
-    // document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>load_database</h3>"+JSON.stringify(load_database)
-    document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>node_database</h3>"+JSON.stringify(node_database) +"<br>"
+    document.getElementsByClassName("sidebar-data")[0].innerHTML = "<h3>curr_active_node</h3><div class='curr_node_div'>"+ curr_active_node +"</div><br>"
+    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>node_database</h3>"+give_table(node_database) +"<br>"
+    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>member_database</h3>"+give_table(member_database)
+    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>load_database</h3>"+give_table(load_database)
 
-},200)
+},300)
 
 
 function give_table(x){
     let row_no = x.length;
-    let col_no = x[0].length;
+    let all_data=x[0].all_data;
+    let col_no = all_data.length;
     let table_insides ="";
-    for(let i=0;i< row_no+1;i++){
+    for(let i=0;i< row_no;i++){
         table_insides += "<tr class='data-tr'>"
-        for(let j=0;j< col_no+1;j++){
-            if(i!=0){
-                if(j!=0){
-                    let temp_wrd= x[i-1][j-1]
-                    if(typeof(temp_wrd)=="number"){
-                        if(x[i-1][j-1] < 0.00001 && x[i-1][j-1] > -0.00001) x[i-1][j-1] = 0
-                        x[i-1][j-1] = Math.round(x[i-1][j-1] * 1000) / 1000
+        if(i!=0) {
+            for(let j=0;j<col_no;j++){
+                if(x[i].type!="udl"&& !x[i].for_udl){
+                    let temp_datao = x[i][all_data[j]]
+                    if(temp_datao) table_insides += `<td class="data-td data-td-only">${JSON.stringify(temp_datao)}</td>`
+                    else table_insides += `<td class="data-td data-td-only">-</td>`
+                }
+                else if(x[i].type=="udl"){
+                    let temp_datao= x[i][all_data[j]];
+                    if(all_data[j]=="node_no"){
+                        temp_datao = [x[i].node1,x[i].node2]
                     }
-                    table_insides += `<td class="data-td data-td-only">${x[i-1][j-1]}</td>`
+                    if(temp_datao) table_insides += `<td class="data-td data-td-only">${JSON.stringify(temp_datao)}</td>`
+                    else table_insides += `<td class="data-td data-td-only">-</td>`
                 }
-                else{
-                    table_insides += `<th class="data-td">${i}</th>`
-                }
-            }
-            else{
-                if(j!=0) table_insides += `<th class="data-td">${j}</th>`
-                else table_insides += `<th class="data-td"></th>`
+
             }
         }
+        else{
+            for(let j=0;j<col_no;j++){
+                table_insides+=`<th class="data-td data-th">${all_data[j]}</th>`
+            }
+        }
+        // for(let j=0;j< col_no+1;j++){
+        //     if(i!=0){
+        //         if(j!=0){
+        //             let temp_wrd= x[i-1][j-1]
+        //             if(typeof(temp_wrd)=="number"){
+        //                 if(x[i-1][j-1] < 0.00001 && x[i-1][j-1] > -0.00001) x[i-1][j-1] = 0
+        //                 x[i-1][j-1] = Math.round(x[i-1][j-1] * 1000) / 1000
+        //             }
+        //             table_insides += `<td class="data-td data-td-only">${x[i-1][j-1]}</td>`
+        //         }
+        //         else{
+        //             table_insides += `<th class="data-td">${i}</th>`
+        //         }
+        //     }
+        //     else{
+        //         if(j!=0) table_insides += `<th class="data-td">${j}</th>`
+        //         else table_insides += `<th class="data-td"></th>`
+        //     }
+        // }
         table_insides += "</tr>"
     }
 

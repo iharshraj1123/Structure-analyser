@@ -16,6 +16,8 @@
   --toolbar-bg:#eeeeee;
   --matrix-border:#a49d9d;
   --matrix-bg:#f2f2f2;
+  --data-border:#a49d9d;
+  --data-bg:#f2f2f2;
 }
 
 body{
@@ -88,8 +90,9 @@ body{
 
 .sidebar{
   width: 27%;
-  background-color: #e4e4e4;
+  background-color: #e5e5e5;
   overflow: auto;
+  padding:6px;
 }
 .sidebar-debugger{
   overflow-wrap: break-word;
@@ -242,7 +245,8 @@ body{
   margin: 5px 10px;
   position:relative;
   padding-right: 6px;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
+  border-collapse: collapse;
 }
 .matrix-table tr:hover{
 	background-color:#7ac8fc
@@ -263,4 +267,28 @@ body{
 }
 .matrix-tr:nth-child(2) .matrix-td:first-child{
   border-top:0;
+}
+
+.data-table{
+  background: var(--data-bg);
+  margin: 5px 10px;
+  position:relative;
+  padding-right: 6px;
+  padding-bottom: 4px;
+  border-collapse: collapse;
+  user-select: none;
+}
+.data-th{
+  background-color: rgb(188, 214, 255);
+}
+.data-table,.data-td{
+  border: 1px solid var(--data-border);
+  background-clip: padding-box; 
+}
+.data-table tr:hover{
+	background-color:#7ac8fc
+}
+.data-td {
+  padding:0px 10px;
+  position:relative;
 }
