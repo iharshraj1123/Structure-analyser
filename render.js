@@ -25,9 +25,12 @@ let magn_div = document.getElementsByClassName("magn-div")[0];
 let supp_grp = document.getElementsByClassName("svg-supports")[0];
 let load_grp = document.getElementsByClassName("svg-loads")[0];
 let result_div= document.getElementsByClassName("Results")[0];
-let node_database = [{node_no:0,cx:0,cy:0,support:"none",pointLoad:"none",concMoment:"none",all_data:["node_no","cx","cy","support"]}]
-let member_database = [{node1:0,node2:0,length:0,x1:0,y1:0,x2:0,y2:0,I:1,E:1,A:1,all_data:["node1","node2","length","A","E","I"]}]
-let load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis",all_data:["node_no","type","magn","direction"]}]
+let all_data_node = ["node_no","cx","cy","support"]
+let all_data_mem = ["member","node1","node2","length","A","E","I"]
+let all_data_load = ["node_no","type","magn","direction"]
+let node_database = [{node_no:0,cx:0,cy:0,support:"none",pointLoad:"none",concMoment:"none",mem_connected:[],all_data:all_data_node}]
+let member_database = [{member:0,node1:0,node2:0,length:0,x1:0,y1:0,x2:0,y2:0,I:1,E:1,A:1,all_data:all_data_mem}]
+let load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis",all_data:all_data_load}]
 let node_click_todo = "none"
 let curr_active_node=0;
 let was_it_the_node=false;
@@ -73,7 +76,6 @@ window.onload = function(){
         //Loading saved data
         let temp_node_database = JSON.parse(getCookie("node_database"))
         let temp_load_database = JSON.parse(getCookie("load_database"))
-        console.log({temp_load_database:temp_load_database},{temp_node_database:temp_node_database})
         let temp_member_database = JSON.parse(getCookie("member_database"))
         curr_active_node=1;
         for(let i=1;i<temp_member_database.length;i++){
@@ -97,7 +99,6 @@ window.onload = function(){
             else if(temp_load_database[i].type =="udl"){
                 udl_nodes[0]= parseInt(temp_load_database[i].node1)
                 udl_nodes[1]= parseInt(temp_load_database[i].node2)
-                console.log(udl_nodes)
                 add_loads(parseFloat(temp_load_database[i].node2),"udl",parseFloat(temp_load_database[i].magn),parseFloat(temp_load_database[i].direc))
             }
         }
@@ -210,12 +211,10 @@ function add(x,y){
 }
 
 function addPoint(x,y){
-    console.log({x:x,y:y,curr_active_node:curr_active_node})
     let node = document.getElementsByClassName("node-pt")
     if(node.length>0){
         //after first click
         let last_node = node[curr_active_node-1];
-        console.log(last_node)
         if(parseInt(x-node_half_side) == parseInt(last_node.attributes.x.value) && parseInt(y-node_half_side) == parseInt(last_node.attributes.y.value)){
             console.log("same node")
             node[past_active_node-1].style.fill = "rgba(64, 233, 255,0.5)";
@@ -233,11 +232,10 @@ function addPoint(x,y){
             })
             last_node.style.fill = "rgba(64, 233, 255,0.5)";
             if(no_copy_found){
-                console.log("node added")
                 past_active_node=curr_active_node
-                curr_active_node = node.length+1
-                node_insert.insertAdjacentHTML('beforeend', `<rect onclick="nodeclicko(${node_database.length})" class="node-pt node${node_database.length}" x="${x-node_half_side}" y="${y-node_half_side}" width=${node_side} height=${node_side} style="fill:red;" /><text x="${x-node_half_side}" y="${parseInt(y)+22}" class="svg-node-text">${curr_active_node}</text>`);
-                node_database.push({node_no:node.length,x:`${x-node_half_side}`,y:`${y-node_half_side}`,cx:`${x}`,cy:`${y}`})        
+                curr_active_node = parseInt(node_database[node_database.length-1].node_no) +1
+                node_insert.insertAdjacentHTML('beforeend', `<g class='node-g${node_database.length}'><rect onclick="nodeclicko(${node_database.length})" class="node-pt node${node_database.length}" x="${x-node_half_side}" y="${y-node_half_side}" width=${node_side} height=${node_side} style="fill:red;" /><text x="${x-node_half_side}" y="${parseInt(y)+22}" class="svg-node-text">${curr_active_node}</text></g>`);
+                node_database.push({node_no:curr_active_node,x:`${x-node_half_side}`,y:`${y-node_half_side}`,cx:`${x}`,cy:`${y}`,mem_connected:[]})        
             }
             else {
                 no_copy_found = true
@@ -250,8 +248,8 @@ function addPoint(x,y){
     }
     else{
         //for first click
-        node_insert.insertAdjacentHTML('beforeend', `<rect onclick="nodeclicko(${node_database.length})" class="node-pt node${node_database.length}" x="${x-node_half_side}" y="${y-node_half_side}" width=${node_side} height=${node_side} style="fill:red;" /><text x="${x-node_half_side}" y="${parseInt(y)+22}" class="svg-node-text">${curr_active_node}</text>`);
-        node_database.push({node_no:node.length,x:`${x-node_half_side}`,y:`${y-node_half_side}`,cx:`${x}`,cy:`${y}`})
+        node_insert.insertAdjacentHTML('beforeend', `<g class='node-g${node_database.length}'><rect onclick="nodeclicko(${node_database.length})" class="node-pt node${node_database.length}" x="${x-node_half_side}" y="${y-node_half_side}" width=${node_side} height=${node_side} style="fill:red;" /><text x="${x-node_half_side}" y="${parseInt(y)+22}" class="svg-node-text">${curr_active_node}</text></g>`);
+        node_database.push({node_no:node.length,x:`${x-node_half_side}`,y:`${y-node_half_side}`,cx:`${x}`,cy:`${y}`,mem_connected:[]})
     }
 }
 
@@ -283,11 +281,39 @@ function nodeclicko(node_no){
     else if(node_click_todo == "hinge"){
         add_support(node_no,"hinge")
     }
+    else if(node_click_todo=="removeLoads"){
+        deleteLoads(node_no)
+        update_todo(node_click_todo)
+    }
     else{
         //setTimeout(function(){ curr_active_node=node_no},50)
         past_active_node=curr_active_node
         curr_active_node=node_no
         console.log("node changed to node" + curr_active_node)
+    }
+}
+
+function deleteLoads(node_no){
+    for(let i=0;i<load_database.length;i++){
+        let temposel = load_database[i];
+        if(temposel.type!="udl" && temposel.node_no==node_no){
+            load_database.splice(i, 1);
+            let load_todel= document.getElementsByClassName(`load${node_no}`)
+            for(let j=0;j<load_todel.length;j++){
+                load_todel[j].innerHTML=""
+            }
+        }
+        else if(temposel.type=="udl"&&(temposel.node1==node_no||temposel.node2==node_no)){
+            load_database.splice(i, 1);
+            let load_todel= document.getElementsByClassName(`udl${temposel.node1}-${temposel.node2}`)
+            for(let j=0;j<load_todel.length;j++){
+                load_todel[j].innerHTML=""
+            }
+            let load_todel2= document.getElementsByClassName(`udl${temposel.node2}-${temposel.node1}`)
+            for(let j=0;j<load_todel2.length;j++){
+                load_todel2[j].innerHTML=""
+            }
+        }
     }
 }
 
@@ -324,8 +350,10 @@ function drawLine(){
         let member_len = coord_dist(last_node_x,last_node_y,0,seclast_node_x,seclast_node_y,0,true)
         // console.log({seclast_node_y:seclast_node_y,last_node_y:last_node_y,mid:(last_node_y+seclast_node_y)/2})
         // console.log({seclast_node_x:seclast_node_x,last_node_x:last_node_x,mid:(last_node_x+seclast_node_x)/2})
-        let mem_nos=member_database.length
+        let mem_nos=parseInt(member_database[member_database.length-1].member)+1
         member_database.push({member:mem_nos,node1:early_node_no,node2:last_node_no,length: member_len,x1:seclast_node_x,y1:seclast_node_y,x2:last_node_x,y2:last_node_y,I:input_I.value,E:input_E.value,A:input_A.value})
+        node_database[early_node_no].mem_connected.push(mem_nos)
+        node_database[last_node_no].mem_connected.push(mem_nos)
         member_len = Math.round(member_len * 100) / 100
         let text_x1=parseInt(seclast_node_x)
         let text_x2=parseInt(last_node_x)
@@ -334,7 +362,7 @@ function drawLine(){
         let final_text_x=(text_x1+text_x2)/2
         let final_text_y=(text_y1+text_y2)/2
         if((text_y2-text_y1)/(text_x2-text_x1)<-0.5) final_text_x -=20
-        sheet_insert.insertAdjacentHTML('beforeend', `<line onclick="memberclicked(${mem_nos})" onmouseout="mem_mousout(${mem_nos})" onmouseover="mem_mousover(${mem_nos})" class="member member${mem_nos}" x1="${seclast_node_x+node_half_side}" y1="${seclast_node_y+node_half_side}" x2="${last_node_x+node_half_side}" y2="${last_node_y+node_half_side}" style="stroke:black;stroke-width:2" /><text x="${final_text_x}" y="${final_text_y}" class="svg-member-text">${member_len} m</text>`);
+        sheet_insert.insertAdjacentHTML('beforeend', `<g class='member${mem_nos}'><line onclick="memberclicked(${mem_nos})" onmouseout="mem_mousout(${mem_nos})" onmouseover="mem_mousover(${mem_nos})" class="member" x1="${seclast_node_x+node_half_side}" y1="${seclast_node_y+node_half_side}" x2="${last_node_x+node_half_side}" y2="${last_node_y+node_half_side}" style="stroke:black;stroke-width:2" /><text x="${final_text_x}" y="${final_text_y}" class="svg-member-text">${member_len} m</text></g>`);
     }
 }
 function mem_mousout(x){
@@ -400,7 +428,7 @@ function add_loads(node_no, type, magn,direc,for_udl){
         else node_database[node_no].pointLoad.magnitude = parseFloat(node_database[node_no].pointLoad.magnitude)+ magn
         if(!for_udl) {
             load_database.push({node_no:node_no,type:"pointLoad",magn:magn,direction:direc})
-           load_grp.innerHTML+= `<g class="load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="8" y="-20" class="svg-magn-text">${magn} KN</text><line x1="0" y1="-50" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>`
+           load_grp.innerHTML+= `<g class="load${node_no} pointLoad${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="8" y="-20" class="svg-magn-text">${magn} KN</text><line x1="0" y1="-50" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>`
         }
         else{
             load_database.push({node_no:node_no,type:"pointLoad",magn:magn,direction:direc,for_udl:"true"})
@@ -414,8 +442,8 @@ function add_loads(node_no, type, magn,direc,for_udl){
         else node_database[node_no].concMoment.magnitude = parseFloat(node_database[node_no].concMoment.magnitude)+ magn
         if(!for_udl){
             load_database.push({node_no:node_no,type:"concMoment",magn:magn})
-            if(magn>0) load_grp.innerHTML+= `<g class="load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="20" y="-21" class="svg-magn-text">${magn} KNm</text><g><path d="M-24 0A24 24 0 0 0 21.6 10.4 " class="load-force" transform="rotate(180 0 0)"></path><polygon points="-15.6,-7.7 -27.6,-13.3 -28,2" class="load-force-head"></polygon></g></g>`
-            else load_grp.innerHTML+= `<g class="load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="20" y="-21" class="svg-magn-text">${magn.slice(1)} KNm</text><g><polygon points="15.6,-7.6 27.6,-13.3 28,2" class="load-force-head"></polygon><path d="M24 0A24 24 0 0 1 -21.6 10.4 " class="load-force" transform="rotate(180 0 0)"></path></g></g>`    
+            if(magn>0) load_grp.innerHTML+= `<g class="concMoment${node_no} load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="20" y="-21" class="svg-magn-text">${magn} KNm</text><g><path d="M-24 0A24 24 0 0 0 21.6 10.4 " class="load-force" transform="rotate(180 0 0)"></path><polygon points="-15.6,-7.7 -27.6,-13.3 -28,2" class="load-force-head"></polygon></g></g>`
+            else load_grp.innerHTML+= `<g class="concMoment${node_no} load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="20" y="-21" class="svg-magn-text">${magn.slice(1)} KNm</text><g><polygon points="15.6,-7.6 27.6,-13.3 28,2" class="load-force-head"></polygon><path d="M24 0A24 24 0 0 1 -21.6 10.4 " class="load-force" transform="rotate(180 0 0)"></path></g></g>`    
         }
         else load_database.push({node_no:node_no,type:"concMoment",magn:magn,for_udl:"true"})
    }
@@ -439,7 +467,7 @@ function add_loads(node_no, type, magn,direc,for_udl){
         }
         let hide_uniline=""
         if(direc!=90) hide_uniline ="hidemepls"
-        let udl_html=`<g transform="translate(${temp_cx_1} ${temp_cy_1})"><line x1="0" y1="-39" x2="${dist_btw_end*slope_currection}" y2="${-39 + dist_slope*dist_btw_end*slope_currection}" class="load-force-uniform ${hide_uniline}"></line><g transform="rotate(${90-direc} 0 0)"><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>${mid_html}<text x="${dist_btw_end*slope_currection/2-5}" y="${-50+dist_slope*dist_btw_end*slope_currection/2}" class="svg-magn-text">${magn} KN/m</text></g>`
+        let udl_html=`<g class='udl${udl_nodes[0]}-${udl_nodes[1]}' transform="translate(${temp_cx_1} ${temp_cy_1})"><line x1="0" y1="-39" x2="${dist_btw_end*slope_currection}" y2="${-39 + dist_slope*dist_btw_end*slope_currection}" class="load-force-uniform ${hide_uniline}"></line><g transform="rotate(${90-direc} 0 0)"><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>${mid_html}<text x="${dist_btw_end*slope_currection/2-5}" y="${-50+dist_slope*dist_btw_end*slope_currection/2}" class="svg-magn-text">${magn} KN/m</text></g>`
         load_grp.innerHTML+= udl_html
         let udl_fem = get_udl_FEM(magn,direc,Math.atan(dist_slope)*180/Math.PI,mem_len)
         let moment_corr = 1;
@@ -471,15 +499,46 @@ function get_udl_FEM(x,udl_deg,mem_deg,L){
     return [fem,fef,fef2]
 }
 
-function memberclicked(){
-    if(false && node_click_todo=="pointLoad"){
-        //stickCo_ords(mouseo.x,mouseo.y)
-        stickCo_ords(mouseo.x,mouseo.y)
-        addPoint(temp_x_sticky,temp_y_sticky)
-        let magn = document.getElementsByClassName("magn-input")[0].value;
-        let deg = document.getElementsByClassName("magndeg-input")[0].value
-        add_loads(document.getElementsByClassName("node-pt").length,"pointLoad",magn,deg)
+function memberclicked(x){
+    // if(false && node_click_todo=="pointLoad"){
+    //     //stickCo_ords(mouseo.x,mouseo.y)
+    //     stickCo_ords(mouseo.x,mouseo.y)
+    //     addPoint(temp_x_sticky,temp_y_sticky)
+    //     let magn = document.getElementsByClassName("magn-input")[0].value;
+    //     let deg = document.getElementsByClassName("magndeg-input")[0].value
+    //     add_loads(document.getElementsByClassName("node-pt").length,"pointLoad",magn,deg)
+    // }
+    if(node_click_todo=="removeMember"){
+        let tempnode1 = parseInt(member_database[x].node1)
+        let tempnode2 = parseInt(member_database[x].node2)
+
+        member_database.splice(x,1)
+        let index = node_database[tempnode1].mem_connected.indexOf(x);
+        node_database[tempnode1].mem_connected.splice(index,1)
+        index = node_database[tempnode2].mem_connected.indexOf(x);
+        node_database[tempnode2].mem_connected.splice(index,1)
+
+        document.getElementsByClassName(`member${x}`)[0].innerHTML=""
+        deleteLoads(tempnode1)
+        deleteLoads(tempnode2)
+        if(node_database[tempnode1].mem_connected.length==0) delete_node(tempnode1)
+        if(node_database[tempnode2].mem_connected.length==0) delete_node(tempnode2)
+        update_todo(node_click_todo)
     }
+}
+
+function delete_node(x){
+    x= parseInt(x)
+    deleteLoads(x)
+    let node_g = document.getElementsByClassName(`node-g${x}`)
+    for(let i=0;i<node_g.length;i++){
+        node_g[i].innerHTML=""
+    }
+    let support_g = document.getElementsByClassName(`support${x}`)
+    for(let i=0;i<node_g.length;i++){
+        support_g[i].innerHTML=""
+    }
+    node_database.splice(x,1)
 }
 
 function clear_svg(){
@@ -487,11 +546,11 @@ function clear_svg(){
     sheet_insert_hinges.innerHTML=""
     input_dx.value = ""
     input_dy.value = ""
-    load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis"}]
+    load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis",all_data:all_data_load}]
     supp_grp.innerHTML=""
     load_grp.innerHTML=""
-    node_database = [{cx:0,cy:0,support:"none",pointLoad:"none",concMoment:"none"}]
-    member_database = [{node1:0,node2:0,length:0,x1:0,y1:0,x2:0,y2:0,I:1,E:1,A:1}]
+    node_database = [{node_no:0,cx:0,cy:0,support:"none",pointLoad:"none",concMoment:"none",mem_connected:[],all_data:all_data_node}]
+    member_database = [{member:0,node1:0,node2:0,length:0,x1:0,y1:0,x2:0,y2:0,I:1,E:1,A:1,all_data:all_data_mem}]
     temp_x_sticky=0;
     temp_y_sticky=0
     is_drawing=false;

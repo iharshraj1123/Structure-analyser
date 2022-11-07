@@ -148,6 +148,7 @@ body{
   padding: 6px 0;
   align-content: center;
   align-items: center;
+  min-height: 52px;
 }
 
 .co-ord-div-top > *{
@@ -230,7 +231,7 @@ body{
   z-index: 10;
 }
 .magn-div{
-  height: 130px;
+  height: 85px;
 }
 .magn-input{
   width: 50px;
