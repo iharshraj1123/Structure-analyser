@@ -25,9 +25,9 @@ let magn_div = document.getElementsByClassName("magn-div")[0];
 let supp_grp = document.getElementsByClassName("svg-supports")[0];
 let load_grp = document.getElementsByClassName("svg-loads")[0];
 let result_div= document.getElementsByClassName("Results")[0];
-let node_database = [{node_no:0,cx:0,cy:0,support:"none",pointLoad:"none",concMoment:"none"}]
-let member_database = [{node1:0,node2:0,length:0,x1:0,y1:0,x2:0,y2:0,I:1,E:1,A:1}]
-let load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis"}]
+let node_database = [{node_no:0,cx:0,cy:0,support:"none",pointLoad:"none",concMoment:"none",all_data:["node_no","cx","cy","support","pointLoad","concMoment"]}]
+let member_database = [{node1:0,node2:0,length:0,x1:0,y1:0,x2:0,y2:0,I:1,E:1,A:1,all_data:["node1","node2","length","A","E","I"]}]
+let load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis",all_data:["node_no","type","magn",""]}]
 let node_click_todo = "none"
 let curr_active_node=0;
 let was_it_the_node=false;
@@ -70,26 +70,36 @@ window.addEventListener('keydown', (e) => {
 window.onload = function(){
     setTimeout(addgrids,200)
     if(getCookie("node_database")!=""){
+        //Loading saved data
         let temp_node_database = JSON.parse(getCookie("node_database"))
         let temp_load_database = JSON.parse(getCookie("load_database"))
+        console.log({temp_load_database:temp_load_database},{temp_node_database:temp_node_database})
         let temp_member_database = JSON.parse(getCookie("member_database"))
-        console.log(temp_node_database)
         curr_active_node=1;
-
-        for(let i=1;i<temp_node_database.length;i++){
-            addPoint(temp_node_database[i].cx,temp_node_database[i].cy)
+        for(let i=1;i<temp_member_database.length;i++){
+            let elo = temp_member_database[i]
+            addPoint(elo.x1+node_half_side,elo.y1+node_half_side)
+            addPoint(elo.x2+node_half_side,elo.y2+node_half_side)
             drawLine()
+            member_database[i].I = temp_member_database[i].I
+            member_database[i].A = temp_member_database[i].A
+            member_database[i].E = temp_member_database[i].E
+        }
+        for(let i=1;i<temp_node_database.length;i++){
             if(temp_node_database[i].support != "none") add_support(i,temp_node_database[i].support)
         }
         let node = document.getElementsByClassName("node-pt")
         node[node.length-1].style.fill = "rgba(64, 233, 255,0.5)";
         for(let i=1;i<temp_load_database.length;i++){
-            add_loads(temp_load_database[i].node_no,temp_load_database[i].type,temp_load_database[i].magn,temp_load_database[i].direction)
-        }
-        for(let i=1;i<temp_member_database.length;i++){
-            member_database[i].I = temp_member_database[i].I
-            member_database[i].A = temp_member_database[i].A
-            member_database[i].E = temp_member_database[i].E
+            if(temp_load_database[i].type !="udl" && temp_load_database[i].for_udl!="true"){
+                add_loads(temp_load_database[i].node_no,temp_load_database[i].type,temp_load_database[i].magn,temp_load_database[i].direction)
+            }
+            else if(temp_load_database[i].type =="udl"){
+                udl_nodes[0]= parseInt(temp_load_database[i].node1)
+                udl_nodes[1]= parseInt(temp_load_database[i].node2)
+                console.log(udl_nodes)
+                add_loads(parseFloat(temp_load_database[i].node2),"udl",parseFloat(temp_load_database[i].magn),parseFloat(temp_load_database[i].direc))
+            }
         }
     }
 }
@@ -380,6 +390,7 @@ function add_support(node_no,type){
 
 function add_loads(node_no, type, magn,direc,for_udl){
     if(!direc) direc = 90;
+    node_no = parseInt(node_no);
     let node = document.getElementsByClassName("node-pt")[node_no-1]
     //if(node_database[node_no].pointLoad != "none" && node_database[node_no].pointLoad != null) document.getElementsByClassName(`support${node_no}`)[0].innerHTML=""
     if(type == "pointLoad"){
@@ -388,8 +399,13 @@ function add_loads(node_no, type, magn,direc,for_udl){
         let temp_cx = add(node.attributes.x.value,node_half_side)
         if(node_database[node_no].pointLoad ==null || node_database[node_no].pointLoad.magnitude == 0) node_database[node_no].pointLoad = {x:temp_cx,y:temp_cy,magnitude:magn,direc:direc}
         else node_database[node_no].pointLoad.magnitude = parseFloat(node_database[node_no].pointLoad.magnitude)+ magn
-        load_database.push({node_no:node_no,type:"pointLoad",magn:magn,direction:direc})
-        if(!for_udl) load_grp.innerHTML+= `<g class="load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="8" y="-15" class="svg-magn-text">${magn} KN</text><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>`
+        if(!for_udl) {
+            load_database.push({node_no:node_no,type:"pointLoad",magn:magn,direction:direc})
+           load_grp.innerHTML+= `<g class="load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="8" y="-20" class="svg-magn-text">${magn} KN</text><line x1="0" y1="-50" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>`
+        }
+        else{
+            load_database.push({node_no:node_no,type:"pointLoad",magn:magn,direction:direc,for_udl:"true"})
+        }    
     }
     else if(type=="concMoment"){
         console.log("moment of "+ magn +" on node_no=" + node_no)
@@ -397,11 +413,12 @@ function add_loads(node_no, type, magn,direc,for_udl){
         let temp_cx = add(node.attributes.x.value,node_half_side)
         if(node_database[node_no].concMoment ==null || node_database[node_no].concMoment.magnitude == 0) node_database[node_no].concMoment = {x:temp_cx,y:temp_cy,magnitude:magn}
         else node_database[node_no].concMoment.magnitude = parseFloat(node_database[node_no].concMoment.magnitude)+ magn
-        load_database.push({node_no:node_no,type:"concMoment",magn:magn})
         if(!for_udl){
+            load_database.push({node_no:node_no,type:"concMoment",magn:magn})
             if(magn>0) load_grp.innerHTML+= `<g class="load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="20" y="-21" class="svg-magn-text">${magn} KNm</text><g><path d="M-24 0A24 24 0 0 0 21.6 10.4 " class="load-force" transform="rotate(180 0 0)"></path><polygon points="-15.6,-7.7 -27.6,-13.3 -28,2" class="load-force-head"></polygon></g></g>`
             else load_grp.innerHTML+= `<g class="load${node_no}" _y="${temp_cy}" _x="${temp_cx}" transform="rotate(${90-direc} ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><text x="20" y="-21" class="svg-magn-text">${magn.slice(1)} KNm</text><g><polygon points="15.6,-7.6 27.6,-13.3 28,2" class="load-force-head"></polygon><path d="M24 0A24 24 0 0 1 -21.6 10.4 " class="load-force" transform="rotate(180 0 0)"></path></g></g>`    
         }
+        else load_database.push({node_no:node_no,type:"concMoment",magn:magn,for_udl:"true"})
    }
     else if(type=="udl"){
         console.log("UDL b/w node_no= "+udl_nodes[0]+"and "+udl_nodes[1])
@@ -426,12 +443,15 @@ function add_loads(node_no, type, magn,direc,for_udl){
         }
         let hide_uniline=""
         if(direc!=90) hide_uniline ="hidemepls"
-        let udl_html=`<g transform="translate(${temp_cx_1} ${temp_cy_1})"><line x1="0" y1="-39" x2="${dist_btw_end*slope_currection}" y2="${-39 + dist_slope*dist_btw_end*slope_currection}" class="load-force-uniform hide_uniline"></line><g transform="rotate(${90-direc} 0 0)"><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>${mid_html}<text x="${dist_btw_end*slope_currection/2-5}" y="${-50+dist_slope*dist_btw_end*slope_currection/2}" class="svg-magn-text">${magn} KN/m</text></g>`
+        let udl_html=`<g transform="translate(${temp_cx_1} ${temp_cy_1})"><line x1="0" y1="-39" x2="${dist_btw_end*slope_currection}" y2="${-39 + dist_slope*dist_btw_end*slope_currection}" class="load-force-uniform ${hide_uniline}"></line><g transform="rotate(${90-direc} 0 0)"><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>${mid_html}<text x="${dist_btw_end*slope_currection/2-5}" y="${-50+dist_slope*dist_btw_end*slope_currection/2}" class="svg-magn-text">${magn} KN/m</text></g>`
         load_grp.innerHTML+= udl_html
         let udl_fem = get_udl_FEM(magn,direc,Math.atan(dist_slope)*180/Math.PI,mem_len)
         let moment_corr = 1;
         if(temp_cx_2-temp_cx_1<0) moment_corr = -1 //when drawing towards left
         console.log({moment_corr:moment_corr})
+        //node_database.contains
+        load_database.push({node1:udl_nodes[0],node2:udl_nodes[1],fem:udl_fem[0],fef:udl_fem[1],fef2:udl_fem[2],type:"udl",magn:magn,direc:direc})
+
         add_loads(udl_nodes[0],"concMoment", udl_fem[0]*moment_corr,0,true)
         add_loads(udl_nodes[1],"concMoment", -1*udl_fem[0]*moment_corr,0,true)
         console.log({node1:udl_nodes[0],node2:udl_nodes[1],moment_node1: udl_fem[0]*moment_corr})
@@ -483,7 +503,7 @@ function clear_svg(){
     sheet_insert_temp.innerHTML="";
     was_it_the_node=false;
     curr_active_node=0;
-    result_div.innerHTML="";extras
+    result_div.innerHTML="";
     update_todo(node_click_todo)
 }
 
@@ -495,10 +515,45 @@ function save_data(){
 
 setInterval(function() {
     document.getElementsByClassName("sidebar-debugger")[0].innerHTML = "<h3>curr_active_node</h3>"+ curr_active_node +"<br>"
+    // document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>node_database</h3>"+JSON.stringify(node_database) +"<br>"
+    // document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>member_database</h3>"+JSON.stringify(member_database)
+    // document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>load_database</h3>"+JSON.stringify(load_database)
     document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>node_database</h3>"+JSON.stringify(node_database) +"<br>"
-    document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>member_database</h3>"+JSON.stringify(member_database)
-    document.getElementsByClassName("sidebar-debugger")[0].innerHTML += "<h3>load_database</h3>"+JSON.stringify(load_database)
+
 },200)
+
+
+function give_table(x){
+    let row_no = x.length;
+    let col_no = x[0].length;
+    let table_insides ="";
+    for(let i=0;i< row_no+1;i++){
+        table_insides += "<tr class='data-tr'>"
+        for(let j=0;j< col_no+1;j++){
+            if(i!=0){
+                if(j!=0){
+                    let temp_wrd= x[i-1][j-1]
+                    if(typeof(temp_wrd)=="number"){
+                        if(x[i-1][j-1] < 0.00001 && x[i-1][j-1] > -0.00001) x[i-1][j-1] = 0
+                        x[i-1][j-1] = Math.round(x[i-1][j-1] * 1000) / 1000
+                    }
+                    table_insides += `<td class="data-td data-td-only">${x[i-1][j-1]}</td>`
+                }
+                else{
+                    table_insides += `<th class="data-td">${i}</th>`
+                }
+            }
+            else{
+                if(j!=0) table_insides += `<th class="data-td">${j}</th>`
+                else table_insides += `<th class="data-td"></th>`
+            }
+        }
+        table_insides += "</tr>"
+    }
+
+    return `<table class="data-table">${table_insides}</table>`
+}
+
 
 /////////////Extras////////////
 
