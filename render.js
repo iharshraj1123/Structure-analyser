@@ -392,7 +392,6 @@ function add_loads(node_no, type, magn,direc,for_udl){
     if(!direc) direc = 90;
     node_no = parseInt(node_no);
     let node = document.getElementsByClassName("node-pt")[node_no-1]
-    //if(node_database[node_no].pointLoad != "none" && node_database[node_no].pointLoad != null) document.getElementsByClassName(`support${node_no}`)[0].innerHTML=""
     if(type == "pointLoad"){
         console.log("pt_load node_no=" + node_no)
         let temp_cy = add(node.attributes.y.value,node_half_side)
@@ -431,14 +430,11 @@ function add_loads(node_no, type, magn,direc,for_udl){
         let no_of_arrows = Math.floor(dist_btw_end/one_unit)
         let dist_btw_arrows = dist_btw_end/no_of_arrows
         let dist_slope = (temp_cy_2-temp_cy_1)/(temp_cx_2-temp_cx_1)
-        // let slope_sign=1;
-        // if(dist_slope<0) slope_sign=-1;
         let slope_currection=1;
         if(temp_cx_2-temp_cx_1<0) slope_currection=-1;
 
         let mid_html;
         for(i=0;i<no_of_arrows;i++){
-            // mid_html+=`<g><line x1="${(i+1)*dist_btw_arrows}" y1="-40" x2="${(i+1)*dist_btw_arrows}" y2="-13" class="load-force"></line><polygon points="${(i+1)*dist_btw_arrows-6.5},${(i+1)*dist_btw_arrows-14},${(i+1)*dist_btw_arrows+6.6},${(i+1)*dist_btw_arrows-14} ${(i+1)*dist_btw_arrows},${(i+1)*dist_btw_arrows-14}" class="load-force-head"></polygon></g>`
             mid_html+=`<g transform="rotate(${90-direc} ${(i+1)*dist_btw_arrows*slope_currection} ${dist_slope*(i+1)*dist_btw_arrows*slope_currection}) translate(${(i+1)*dist_btw_arrows*slope_currection} ${dist_slope*(i+1)*dist_btw_arrows*slope_currection})"><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>`
         }
         let hide_uniline=""
@@ -476,7 +472,7 @@ function get_udl_FEM(x,udl_deg,mem_deg,L){
 }
 
 function memberclicked(){
-    if(false &&node_click_todo=="pointLoad"){
+    if(false && node_click_todo=="pointLoad"){
         //stickCo_ords(mouseo.x,mouseo.y)
         stickCo_ords(mouseo.x,mouseo.y)
         addPoint(temp_x_sticky,temp_y_sticky)
@@ -514,10 +510,10 @@ function save_data(){
 }
 
 setInterval(function() {
-    document.getElementsByClassName("sidebar-data")[0].innerHTML = "<h3>curr_active_node</h3><div class='curr_node_div'>"+ curr_active_node +"</div><br>"
-    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>node_database</h3>"+give_table(node_database) +"<br>"
-    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>member_database</h3>"+give_table(member_database)
-    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>load_database</h3>"+give_table(load_database)
+    document.getElementsByClassName("sidebar-data")[0].innerHTML = "<h3>Current Active Node</h3><div class='curr_node_div'>"+ curr_active_node +"</div><br>"
+    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>Node Database</h3>"+give_table(node_database) +"<br>"
+    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>Member Database</h3>"+give_table(member_database)
+    document.getElementsByClassName("sidebar-data")[0].innerHTML += "<h3>Load Database</h3>"+give_table(load_database)
 
 },300)
 
