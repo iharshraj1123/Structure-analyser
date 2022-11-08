@@ -8,6 +8,11 @@ Download: https://drive.google.com/drive/folders/1Xn2rhDHAHWtYOwS9JtUV5WPNDmk0E5
 
 (Above is download for electron version)
 
+## What is electron version?
+- This page features the web version of the app. Electron is PC version for it.
+- Electron version is bundle of everything in web version with chromium (thus larger download size).
+- If you need saving feature and dont understand/want to setup a server, simply download the Electron version.
+
 ## How to use
 - Loads and Supports can only be added at nodes. So if you want to add a force somewhere make sure to add a node there.
 - You cant make nodes randomly between an already defined/drawn member. Make nodes beforehand wherever its needed.
