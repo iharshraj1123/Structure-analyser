@@ -19,6 +19,6 @@ Download the portable version/web version (~750KB): [Save this link as an html f
 - You cant make nodes randomly between an already defined/drawn member. Make nodes beforehand wherever its needed.
 
 ## Note
-- Saving feature won't work without a HTTP server ie apache or node.js. (It will work in the electron version).
+- Saving feature won't work without a HTTP server i.e., apache or node.js. (It will work in the electron version).
 - The main file is index.html, open it in any modern browser.
 - html file in dist is portable version (but its not always updated). The whole app is compiled into the structure analyser.html in dist.
