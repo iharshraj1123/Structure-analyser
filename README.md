@@ -7,9 +7,11 @@ Simple and light. Can have bugs use for educational purposes only.
 
 Download: https://drive.google.com/drive/folders/1Xn2rhDHAHWtYOwS9JtUV5WPNDmk0E5kf
 
-(Above is download for electron version)
+(Above is download for electron version, ~91MB)
 
 Download the portable version: [Save this link as an html file](https://raw.githubusercontent.com/iharshraj1123/Structure-analyser/master/dist/structure%20analyser.html)
+
+(Above is link for the file in dist folder, ~750KB)
 
 ## What is electron version?
 - This page features the web version of the app. Electron is PC version for it.
