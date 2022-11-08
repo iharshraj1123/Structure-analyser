@@ -1,6 +1,7 @@
 # Structure-analyser
 
-![loadings](https://user-images.githubusercontent.com/33609172/200195876-c3a3ffaf-f4a5-4830-9da7-f610c9b19420.jpg)
+![image](https://user-images.githubusercontent.com/33609172/200633270-10c360ad-7adc-46a3-937a-c7428526f77b.png)
+
 
 Simple and light. Can have bugs use for educational purposes only.
 
