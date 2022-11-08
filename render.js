@@ -504,7 +504,7 @@ function add_loads(node_no, type, magn,direc,for_udl){
         if(direc!=90) hide_uniline ="hidemepls"
         let udl_html=`<g class='udl${udl_nodes[0]}-${udl_nodes[1]}' transform="translate(${temp_cx_1} ${temp_cy_1})"><line x1="0" y1="-39" x2="${dist_btw_end*slope_currection}" y2="${-39 + dist_slope*dist_btw_end*slope_currection}" class="load-force-uniform ${hide_uniline}"></line><g transform="rotate(${90-direc} 0 0)"><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>${mid_html}<text x="${dist_btw_end*slope_currection/2-5}" y="${-50+dist_slope*dist_btw_end*slope_currection/2}" class="svg-magn-text">${magn} KN/m</text></g>`
         load_grp.innerHTML+= udl_html
-        console.log(udl_html)
+        console.log({udl_nodes:udl_nodes})
         let udl_fem = get_udl_FEM(magn,direc,Math.atan(dist_slope)*180/Math.PI,mem_len)
         let moment_corr = 1;
         if(temp_cx_2-temp_cx_1<0) moment_corr = -1 //when drawing towards left
@@ -530,8 +530,8 @@ function get_udl_FEM(x,udl_deg,mem_deg,L){
     let fem = x*cos*L*L*cos*cos/12 + x*cos*L*L*sin*sin/12
     let fef = x*L*math.cos(math.unit(udl_deg-90, 'deg'))/2 //vertical force
     let fef2 = x*L*math.sin(math.unit(udl_deg-90, 'deg'))/2  //horizontal force
-    console.log({fem:fem,fef:fef,fef2:fef2})
-    return [fem,fef,fef2]
+    console.log({fem:-fem,fef:fef,fef2:fef2})
+    return [-fem,fef,fef2]
 }
 
 function memberclicked(x){

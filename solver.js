@@ -193,10 +193,10 @@ function add_rnx(type,temp_cx,temp_cy,magn,direc){
     }
     else{
         if(magn>0){
-            rxn_grp.innerHTML+=`<g transform="translate(${temp_cx} ${temp_cy})"><path d="M-24 0A24 24 0 0 0 21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><polygon points="-15.6,-7.7 -27.6,-13.3 -28,2" class="load-force-head-react"></polygon><text x="20" y="-21" class="svg-magn-rxn-text">${magn} KNm</text></g>`
+            rxn_grp.innerHTML+=`<g transform="rotate(30 ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><path d="M-24 0A24 24 0 0 0 21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><polygon points="-15.6,-7.7 -27.6,-13.3 -28,2" class="load-force-head-react"></polygon><text transform="rotate(-30 0 0)" x="30" y="-5" class="svg-magn-rxn-text">${magn} KNm</text></g>`
         }
         else{
-            rxn_grp.innerHTML+=`<g transform="translate(${temp_cx} ${temp_cy})"><polygon points="15.6,-7.6 27.6,-13.3 28,2" class="load-force-head-react"></polygon><path d="M24 0A24 24 0 0 1 -21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><text x="20" y="-21" class="svg-magn-rxn-text">${magn.slice(1)} KNm</text></g>`
+            rxn_grp.innerHTML+=`<g transform="rotate(30 ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><polygon points="15.6,-7.6 27.6,-13.3 28,2" class="load-force-head-react"></polygon><path d="M24 0A24 24 0 0 1 -21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><text transform="rotate(-30 0 0)" x="30" y="-5" class="svg-magn-rxn-text">${magn.slice(1)} KNm</text></g>`
         }
     }
 }
@@ -439,16 +439,16 @@ function Q_adder(i,supp){
             Q_matrix._data[((i-1)*3)][0] = `Q${((i-1)*3)+1}`
             Q_matrix._data[((i-1)*3)+1][0] = `Q${((i-1)*3)+2}`
             if(node.concMoment != "none" && node.concMoment != null){
-                console.log("concMoment load on node"+i)
-                Q_matrix._data[((i-1)*3)+2][0] = -1*node.concMoment.magnitude
+                console.log("concMoment load on node"+i+` ${node.concMoment.magnitude}`)
+                Q_matrix._data[((i-1)*3)+2][0] = node.concMoment.magnitude
             }
         }
         else if(supp=="roller"){
             //rxn only in y-direction
             Q_matrix._data[((i-1)*3)+1][0] = `Q${((i-1)*3)+2}`
             if(node.concMoment != "none" && node.concMoment != null){
-                console.log("concMoment load on node"+i)
-                Q_matrix._data[((i-1)*3)+2][0] = -1*node.concMoment.magnitude
+                console.log("concMoment load on node"+i+` ${node.concMoment.magnitude}`)
+                Q_matrix._data[((i-1)*3)+2][0] = node.concMoment.magnitude
             }
         }
         else if(supp=="fixed"){
@@ -459,7 +459,7 @@ function Q_adder(i,supp){
             if(node.concMoment != "none" && node.concMoment != null){
                 console.log("extra concMoment load on node"+i)
                 //+1 for example 15.4
-                Q_matrix_extraload._data[((i-1)*3)+2][0] = node.concMoment.magnitude
+                Q_matrix_extraload._data[((i-1)*3)+2][0] = -1*node.concMoment.magnitude
             }
         }
         // else if(supp=="hinge"){
