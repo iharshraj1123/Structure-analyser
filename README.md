@@ -10,7 +10,7 @@ Download the electron version (~91MB): https://drive.google.com/drive/folders/1X
 Download the portable version/web version (~750KB): [Save this link as an html file](https://raw.githubusercontent.com/iharshraj1123/Structure-analyser/master/dist/structure%20analyser.html)
 
 ## What is electron version?
-- This page features the web version of the app. Electron is PC app version for it.
+- This repository features the web version of the app. Electron is PC app version for it.
 - Electron version is bundle of everything in web version with chromium (thus larger download size).
 - If you need saving feature and dont understand/want to setup a server, simply download the Electron version.
 
