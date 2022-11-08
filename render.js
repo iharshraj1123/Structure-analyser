@@ -24,6 +24,7 @@ let coord_div= document.getElementsByClassName("co-ord-div")[0];
 let magn_div = document.getElementsByClassName("magn-div")[0];
 let supp_grp = document.getElementsByClassName("svg-supports")[0];
 let load_grp = document.getElementsByClassName("svg-loads")[0];
+let rxn_grp = document.getElementsByClassName("svg-rxns")[0];
 let result_div= document.getElementsByClassName("Results")[0];
 let all_data_node = ["node_no","cx","cy","support"]
 let all_data_mem = ["member","node1","node2","length","A","E","I"]
@@ -36,6 +37,7 @@ let curr_active_node=0;
 let was_it_the_node=false;
 let past_active_node=1;
 let udl_nodes=[]
+let hinges_arr=[];
 
 function update_todo(x){
     if(node_click_todo == x){
@@ -155,6 +157,7 @@ sheet.addEventListener("click",function(event){
     if(node_click_todo == "none"){
         startDraw()
     }
+    rxn_grp.innerHTML=""
 }) 
 
 function startDraw(){
@@ -448,7 +451,7 @@ function add_loads(node_no, type, magn,direc,for_udl){
         else load_database.push({node_no:node_no,type:"concMoment",magn:magn,for_udl:"true"})
    }
     else if(type=="udl"){
-        console.log("UDL b/w node_no= "+udl_nodes[0]+"and "+udl_nodes[1])
+        console.log("UDL b/w node_no= "+udl_nodes[0]+" and "+udl_nodes[1])
         let temp_cx_1 = add(document.getElementsByClassName("node-pt")[udl_nodes[0]-1].attributes.x.value,node_half_side)
         let temp_cy_1 = add(document.getElementsByClassName("node-pt")[udl_nodes[0]-1].attributes.y.value,node_half_side)
         let temp_cy_2 = add(node.attributes.y.value,node_half_side)
@@ -469,6 +472,7 @@ function add_loads(node_no, type, magn,direc,for_udl){
         if(direc!=90) hide_uniline ="hidemepls"
         let udl_html=`<g class='udl${udl_nodes[0]}-${udl_nodes[1]}' transform="translate(${temp_cx_1} ${temp_cy_1})"><line x1="0" y1="-39" x2="${dist_btw_end*slope_currection}" y2="${-39 + dist_slope*dist_btw_end*slope_currection}" class="load-force-uniform ${hide_uniline}"></line><g transform="rotate(${90-direc} 0 0)"><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>${mid_html}<text x="${dist_btw_end*slope_currection/2-5}" y="${-50+dist_slope*dist_btw_end*slope_currection/2}" class="svg-magn-text">${magn} KN/m</text></g>`
         load_grp.innerHTML+= udl_html
+        console.log(udl_html)
         let udl_fem = get_udl_FEM(magn,direc,Math.atan(dist_slope)*180/Math.PI,mem_len)
         let moment_corr = 1;
         if(temp_cx_2-temp_cx_1<0) moment_corr = -1 //when drawing towards left
@@ -545,6 +549,7 @@ function clear_svg(){
     sheet_insert.innerHTML = "";
     sheet_insert_hinges.innerHTML=""
     input_dx.value = ""
+    rxn_grp.innerHTML = ""
     input_dy.value = ""
     load_database = [{node_no:0,type:"pointLoad",magn:5,direction:"theta with our +x axis",all_data:all_data_load}]
     supp_grp.innerHTML=""

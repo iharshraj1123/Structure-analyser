@@ -206,6 +206,12 @@ body{
   stroke-width: 3;
   fill: none;
 }
+.load-force-react{
+  stroke-dasharray: 8px, 4px;
+  stroke: red;
+  fill: none;
+  stroke-width: 3;
+}
 .load-force-uniform{
   stroke-width: 1.65;
   stroke: blue;
@@ -214,9 +220,16 @@ body{
 .load-force-head{
   fill: blue;
 }
+.load-force-head-react{
+  fill:red
+}
 .svg-magn-text{
   font: bold 13px sans-serif;
   fill: blue;
+}
+.svg-magn-rxn-text{
+  font: bold 13px sans-serif;
+  fill: red;
 }
 .svg-node-text{
   font: bold 13px sans-serif;

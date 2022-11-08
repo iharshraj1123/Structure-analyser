@@ -126,7 +126,6 @@ function sti_solve(){
                         // if(last_row!=row_no-1) gap=0
                         // console.log({calc:row_no-1-smallest_row-(gap),gap:gap,last_row:last_row,col_no:col_no,row_no:row_no,smallest_col:smallest_col,smallest_row:smallest_row})
                         K_matrix._data[row_no-1][col_no-1] += k_matrix._data[row_no-1-smallest_row-(gap)][col_no-1-smallest_col-(gap2)]
-                        console.log({x:row_no-1-smallest_row-(gap),y:col_no-1-smallest_col-(gap2),data:k_matrix._data[row_no-1-smallest_row-(gap)][col_no-1-smallest_col-(gap2)]})
                         last_row=row_no-1;
                         last_col=col_no-1;
                         is_first_loop=false
@@ -152,6 +151,54 @@ function sti_solve(){
     }
 
     reResultTable()
+    for(let i=0;i<eq_Matrix2.length;i++){
+        let tempos = eq_Matrix2[i][0]
+        if(tempos.includes("Q")){
+            tempos= parseInt(tempos.slice(1))
+            let temps_magn = final_result_matrix._data[i][0]
+            let temp_cx = node_database[get_nodeno(tempos)].cx
+            let temp_cy = node_database[get_nodeno(tempos)].cy
+            if(tempos%3==1) add_rnx("pointLoad",temp_cx,temp_cy,temps_magn,"horizontal")
+            else if(tempos%3==2) add_rnx("pointLoad",temp_cx,temp_cy,temps_magn,"vert")
+            else add_rnx("concMoment",temp_cx,temp_cy,temps_magn)
+        }
+    } 
+}
+
+function get_nodeno(last_char){
+    //if(hinges_arr.length==0){
+        if(last_char%3 ==0){
+            return last_char/3
+        }
+        else{
+           return ((last_char-(last_char%3))/3)+1
+        }
+    //}
+}
+
+function add_rnx(type,temp_cx,temp_cy,magn,direc){
+    magn = Math.round(magn*1000)/1000
+    magn = `${magn}`
+    temp_cx= parseInt(temp_cx)
+    temp_cy= parseInt(temp_cy)
+    if(type=="pointLoad"){
+        if(direc=="vert"){
+            if(magn<0) rxn_grp.innerHTML+=`<g transform="translate(${temp_cx} ${temp_cy + 65})"><text x="20" y="-21" class="svg-magn-rxn-text">${magn.slice(1)} KN</text><line x1="0" y1="-40" x2="0" y2="-13" class="load-force-react"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head-react"></polygon></g>`
+            else if(magn>0) rxn_grp.innerHTML+=`<g transform="translate(${temp_cx} ${temp_cy + 65})"><text x="20" y="-21" class="svg-magn-rxn-text">${magn} KN</text><line x1="0" y1="0" x2="0" y2="-27" class="load-force-react"></line><polygon points="-6.5,-26 6.5,-26 0,-40" class="load-force-head-react"></polygon></g>`
+        }
+        else{
+            if(magn>0) rxn_grp.innerHTML+=`<g transform="rotate(90 ${temp_cx-15} ${temp_cy +10}) translate(${temp_cx} ${temp_cy +50})"><text x="8" y="-20" class="svg-magn-rxn-text">${magn} KN</text><line x1="0" y1="0" x2="0" y2="-27" class="load-force-react"></line><polygon points="-6.5,-26 6.5,-26 0,-40" class="load-force-head-react"></polygon></g>`
+            else if(magn<0) rxn_grp.innerHTML+=`<g transform="rotate(90 ${temp_cx-15} ${temp_cy +10}) translate(${temp_cx} ${temp_cy+50})"><text x="8" y="-20" class="svg-magn-rxn-text">${magn.slice(1)} KN</text><line x1="0" y1="-40" x2="0" y2="-13" class="load-force-react"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head-react"></polygon></g>`
+        }
+    }
+    else{
+        if(magn>0){
+            rxn_grp.innerHTML+=`<g transform="translate(${temp_cx} ${temp_cy})"><path d="M-24 0A24 24 0 0 0 21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><polygon points="-15.6,-7.7 -27.6,-13.3 -28,2" class="load-force-head-react"></polygon><text x="20" y="-21" class="svg-magn-rxn-text">${magn} KNm</text></g>`
+        }
+        else{
+            rxn_grp.innerHTML+=`<g transform="translate(${temp_cx} ${temp_cy})"><polygon points="15.6,-7.6 27.6,-13.3 28,2" class="load-force-head-react"></polygon><path d="M24 0A24 24 0 0 1 -21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><text x="20" y="-21" class="svg-magn-rxn-text">${magn.slice(1)} KNm</text></g>`
+        }
+    }
 }
 
 function combine_matrix_results(vars,res){
