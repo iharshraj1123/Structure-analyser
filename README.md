@@ -8,11 +8,11 @@ Download: https://drive.google.com/drive/folders/1Xn2rhDHAHWtYOwS9JtUV5WPNDmk0E5
 
 (Above is download for electron version)
 
-#How to use
+## How to use
 - Loads and Supports can only be added at nodes. So if you want to add a force somewhere make sure to add a node there.
 - You cant make nodes randomly between an already defined/drawn member. Make nodes beforehand wherever its needed.
 
-#Note
+## Note
 - Saving feature won't work without a HTTP server ie apache or node.js. (It will work in the electron version).
 - The main file is index.html, open it in any modern browser.
 - html file in dist is portable version (but its not always updated). The whole app is compiled into the structure analyser.html in dist.
