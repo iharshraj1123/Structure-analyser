@@ -9,6 +9,8 @@ Download: https://drive.google.com/drive/folders/1Xn2rhDHAHWtYOwS9JtUV5WPNDmk0E5
 
 (Above is download for electron version)
 
+Download the portable version: [Save this link as an html file](https://raw.githubusercontent.com/iharshraj1123/Structure-analyser/master/dist/structure%20analyser.html)
+
 ## What is electron version?
 - This page features the web version of the app. Electron is PC version for it.
 - Electron version is bundle of everything in web version with chromium (thus larger download size).
