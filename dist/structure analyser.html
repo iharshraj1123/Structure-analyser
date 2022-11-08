@@ -902,7 +902,7 @@ function add_loads(node_no, type, magn,direc,for_udl){
         if(direc!=90) hide_uniline ="hidemepls"
         let udl_html=`<g class='udl${udl_nodes[0]}-${udl_nodes[1]}' transform="translate(${temp_cx_1} ${temp_cy_1})"><line x1="0" y1="-39" x2="${dist_btw_end*slope_currection}" y2="${-39 + dist_slope*dist_btw_end*slope_currection}" class="load-force-uniform ${hide_uniline}"></line><g transform="rotate(${90-direc} 0 0)"><line x1="0" y1="-40" x2="0" y2="-13" class="load-force"></line><polygon points="-6.5,-14 6.5,-14 0,0" class="load-force-head"></polygon></g>${mid_html}<text x="${dist_btw_end*slope_currection/2-5}" y="${-50+dist_slope*dist_btw_end*slope_currection/2}" class="svg-magn-text">${magn} KN/m</text></g>`
         load_grp.innerHTML+= udl_html
-        console.log(udl_html)
+        console.log({udl_nodes:udl_nodes})
         let udl_fem = get_udl_FEM(magn,direc,Math.atan(dist_slope)*180/Math.PI,mem_len)
         let moment_corr = 1;
         if(temp_cx_2-temp_cx_1<0) moment_corr = -1 //when drawing towards left
@@ -928,8 +928,8 @@ function get_udl_FEM(x,udl_deg,mem_deg,L){
     let fem = x*cos*L*L*cos*cos/12 + x*cos*L*L*sin*sin/12
     let fef = x*L*math.cos(math.unit(udl_deg-90, 'deg'))/2 //vertical force
     let fef2 = x*L*math.sin(math.unit(udl_deg-90, 'deg'))/2  //horizontal force
-    console.log({fem:fem,fef:fef,fef2:fef2})
-    return [fem,fef,fef2]
+    console.log({fem:-fem,fef:fef,fef2:fef2})
+    return [-fem,fef,fef2]
 }
 
 function memberclicked(x){
@@ -1309,10 +1309,10 @@ function add_rnx(type,temp_cx,temp_cy,magn,direc){
     }
     else{
         if(magn>0){
-            rxn_grp.innerHTML+=`<g transform="translate(${temp_cx} ${temp_cy})"><path d="M-24 0A24 24 0 0 0 21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><polygon points="-15.6,-7.7 -27.6,-13.3 -28,2" class="load-force-head-react"></polygon><text x="20" y="-21" class="svg-magn-rxn-text">${magn} KNm</text></g>`
+            rxn_grp.innerHTML+=`<g transform="rotate(30 ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><path d="M-24 0A24 24 0 0 0 21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><polygon points="-15.6,-7.7 -27.6,-13.3 -28,2" class="load-force-head-react"></polygon><text transform="rotate(-30 0 0)" x="30" y="-5" class="svg-magn-rxn-text">${magn} KNm</text></g>`
         }
         else{
-            rxn_grp.innerHTML+=`<g transform="translate(${temp_cx} ${temp_cy})"><polygon points="15.6,-7.6 27.6,-13.3 28,2" class="load-force-head-react"></polygon><path d="M24 0A24 24 0 0 1 -21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><text x="20" y="-21" class="svg-magn-rxn-text">${magn.slice(1)} KNm</text></g>`
+            rxn_grp.innerHTML+=`<g transform="rotate(30 ${temp_cx} ${temp_cy}) translate(${temp_cx} ${temp_cy})"><polygon points="15.6,-7.6 27.6,-13.3 28,2" class="load-force-head-react"></polygon><path d="M24 0A24 24 0 0 1 -21.6 10.4 " class="load-force-react" transform="rotate(180 0 0)"></path><text transform="rotate(-30 0 0)" x="30" y="-5" class="svg-magn-rxn-text">${magn.slice(1)} KNm</text></g>`
         }
     }
 }
@@ -1555,16 +1555,16 @@ function Q_adder(i,supp){
             Q_matrix._data[((i-1)*3)][0] = `Q${((i-1)*3)+1}`
             Q_matrix._data[((i-1)*3)+1][0] = `Q${((i-1)*3)+2}`
             if(node.concMoment != "none" && node.concMoment != null){
-                console.log("concMoment load on node"+i)
-                Q_matrix._data[((i-1)*3)+2][0] = -1*node.concMoment.magnitude
+                console.log("concMoment load on node"+i+` ${node.concMoment.magnitude}`)
+                Q_matrix._data[((i-1)*3)+2][0] = node.concMoment.magnitude
             }
         }
         else if(supp=="roller"){
             //rxn only in y-direction
             Q_matrix._data[((i-1)*3)+1][0] = `Q${((i-1)*3)+2}`
             if(node.concMoment != "none" && node.concMoment != null){
-                console.log("concMoment load on node"+i)
-                Q_matrix._data[((i-1)*3)+2][0] = -1*node.concMoment.magnitude
+                console.log("concMoment load on node"+i+` ${node.concMoment.magnitude}`)
+                Q_matrix._data[((i-1)*3)+2][0] = node.concMoment.magnitude
             }
         }
         else if(supp=="fixed"){
@@ -1575,7 +1575,7 @@ function Q_adder(i,supp){
             if(node.concMoment != "none" && node.concMoment != null){
                 console.log("extra concMoment load on node"+i)
                 //+1 for example 15.4
-                Q_matrix_extraload._data[((i-1)*3)+2][0] = node.concMoment.magnitude
+                Q_matrix_extraload._data[((i-1)*3)+2][0] = -1*node.concMoment.magnitude
             }
         }
         // else if(supp=="hinge"){
