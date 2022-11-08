@@ -459,7 +459,7 @@ function Q_adder(i,supp){
             if(node.concMoment != "none" && node.concMoment != null){
                 console.log("extra concMoment load on node"+i)
                 //+1 for example 15.4
-                Q_matrix_extraload._data[((i-1)*3)+2][0] = -1*node.concMoment.magnitude
+                Q_matrix_extraload._data[((i-1)*3)+2][0] = node.concMoment.magnitude
             }
         }
         // else if(supp=="hinge"){

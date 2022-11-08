@@ -50,8 +50,8 @@ function update_todo(x){
         node_click_todo = x;
         if(x=="pointLoad"||x=="udl"||x=="concMoment"){
             magn_div.classList.remove("hidemepls")
-            if(x!="concMoment") document.getElementsByClassName("mag-deg-div")[0].classList.remove("hidemepls")
-            else document.getElementsByClassName("mag-deg-div")[0].classList.add("hidemepls")
+            if(x=="pointLoad") document.getElementsByClassName("mag-deg-div")[0].classList.remove("hidemepls")
+            else{document.getElementsByClassName("mag-deg-div")[0].classList.add("hidemepls");document.getElementsByClassName("magndeg-input")[0].value="90";}
         }
     }
 }
@@ -297,17 +297,49 @@ function nodeclicko(node_no){
 }
 
 function deleteLoads(node_no){
-    for(let i=0;i<load_database.length;i++){
+    node_no=parseInt(node_no)
+    for(let i=0;i<node_database.length;i++){
+        if(node_database[i].node_no==node_no){
+            if(node_database[i].pointLoad) node_database[i].pointLoad.magnitude="0"
+            if(node_database[i].concMoment) node_database[i].concMoment.magnitude="0"
+        }
+    }
+
+    for(let i=1;i<load_database.length;i++){
         let temposel = load_database[i];
         if(temposel.type!="udl" && temposel.node_no==node_no){
+            console.log(`deleting load ${temposel.type} on node ${node_no}`)
             load_database.splice(i, 1);
+            i = i-1
             let load_todel= document.getElementsByClassName(`load${node_no}`)
             for(let j=0;j<load_todel.length;j++){
                 load_todel[j].innerHTML=""
             }
         }
         else if(temposel.type=="udl"&&(temposel.node1==node_no||temposel.node2==node_no)){
+            console.log(`deleting load ${temposel.type} on node ${node_no}`)
             load_database.splice(i, 1);
+            let node_no2;
+            let ptmag=temposel.fef
+            let Mmag=temposel.fem
+            if(temposel.node1==node_no) node_no2=temposel.node2
+            else node_no2=temposel.node1
+            i = i-1
+            for(let j=1;j<load_database.length;j++){
+                let temposel2 = load_database[j];
+                if(temposel2.for_udl=="true" && temposel2.node_no==node_no2){
+                    console.log(`deleting load ${temposel2.type} on node ${node_no2}`)
+                    load_database.splice(j, 1);
+                    j = j-1
+                    if(i>j) i=i-1
+                }
+            }
+            for(let k=1;k<node_database.length;k++){
+                if(node_database[k].node_no==node_no2){
+                    node_database[k].pointLoad.magnitude=parseInt(node_database[k].pointLoad.magnitude)+ ptmag
+                    node_database[k].concMoment.magnitude=parseInt(node_database[k].concMoment.magnitude)-Mmag
+                }
+            }
             let load_todel= document.getElementsByClassName(`udl${temposel.node1}-${temposel.node2}`)
             for(let j=0;j<load_todel.length;j++){
                 load_todel[j].innerHTML=""
@@ -479,9 +511,8 @@ function add_loads(node_no, type, magn,direc,for_udl){
         console.log({moment_corr:moment_corr})
         //node_database.contains
         load_database.push({node1:udl_nodes[0],node2:udl_nodes[1],fem:udl_fem[0],fef:udl_fem[1],fef2:udl_fem[2],type:"udl",magn:magn,direc:direc})
-
-        add_loads(udl_nodes[0],"concMoment", udl_fem[0]*moment_corr,0,true)
-        add_loads(udl_nodes[1],"concMoment", -1*udl_fem[0]*moment_corr,0,true)
+        add_loads(udl_nodes[0],"concMoment", -1*udl_fem[0]*moment_corr,0,true)
+        add_loads(udl_nodes[1],"concMoment", udl_fem[0]*moment_corr,0,true)
         console.log({node1:udl_nodes[0],node2:udl_nodes[1],moment_node1: udl_fem[0]*moment_corr})
         add_loads(udl_nodes[0],"pointLoad", udl_fem[1],90,true)
         add_loads(udl_nodes[1],"pointLoad", udl_fem[1],90,true)
@@ -515,7 +546,7 @@ function memberclicked(x){
     if(node_click_todo=="removeMember"){
         let tempnode1 = parseInt(member_database[x].node1)
         let tempnode2 = parseInt(member_database[x].node2)
-
+        console.log(`deleting member ${x}`)
         member_database.splice(x,1)
         let index = node_database[tempnode1].mem_connected.indexOf(x);
         node_database[tempnode1].mem_connected.splice(index,1)
