@@ -5,6 +5,8 @@
 
 Simple and light. Can have bugs use for educational purposes only.
 
+Known issue: Remove member
+
 Download the electron version (~91MB): https://drive.google.com/drive/folders/1Xn2rhDHAHWtYOwS9JtUV5WPNDmk0E5kf
 
 Download the portable version/web version (~750KB): [Save this link as an html file](https://raw.githubusercontent.com/iharshraj1123/Structure-analyser/master/dist/structure%20analyser.html)
