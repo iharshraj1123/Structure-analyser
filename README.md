@@ -3,7 +3,7 @@
 ![image](https://user-images.githubusercontent.com/33609172/200633270-10c360ad-7adc-46a3-937a-c7428526f77b.png)
 
 
-Simple and light. Can have bugs use for educational purposes only. No comercial use or redistribution.
+Simple and light. Can have bugs use for educational purposes only. No commercial use or redistribution.
 
 Known issue: Remove member
 
