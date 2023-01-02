@@ -7,9 +7,9 @@ Simple and light. Can have bugs use for educational purposes only. No commercial
 
 Known issue: Remove member
 
-Download the electron version (~91MB): https://drive.google.com/drive/folders/1Xn2rhDHAHWtYOwS9JtUV5WPNDmk0E5kf
+Download the electron version [stable in windows 10] (~91MB): https://drive.google.com/drive/folders/1Xn2rhDHAHWtYOwS9JtUV5WPNDmk0E5kf
 
-Download the portable version/web version (~750KB): [Save this link as an html file](https://raw.githubusercontent.com/iharshraj1123/Structure-analyser/master/dist/structure%20analyser.html)
+Download the portable version/web version [stable on all platform] (~750KB): [Save this link as an html file](https://raw.githubusercontent.com/iharshraj1123/Structure-analyser/master/dist/structure%20analyser.html)
 
 ## What is electron version?
 - This repository features the web version of the app. Electron is PC app version for it.
